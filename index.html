@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b16">
+<title>ANNA AI — Your Cyberpunk Assistant</title>
+<style>
+:root {
+  --bg:#080b16;
+  --panel:#11182a;
+  --panel2:#151f35;
+  --cyan:#00f5ff;
+  --pink:#ff2bd6;
+  --purple:#9d65ff;
+  --text:#e9f5ff;
+  --muted:#91a4bd;
+  --border:rgba(0,245,255,.22);
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:
+    radial-gradient(circle at 15% 10%,#19264b 0,transparent 35%),
+    radial-gradient(circle at 90% 30%,#32133c 0,transparent 30%),
+    var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+}
+header {
+  position:sticky; top:0; z-index:5;
+  background:rgba(8,11,22,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:16px 5%;
+  display:flex; align-items:center;
+  justify-content:space-between; gap:12px;
+}
+.logo {
+  font-size:24px; font-weight:900;
+  letter-spacing:3px; color:var(--cyan);
+  text-shadow:0 0 14px var(--cyan);
+}
+.logo span { color:var(--pink); }
+.status { color:#8cffc1; font-size:12px; }
+nav {
+  display:flex; gap:8px; flex-wrap:wrap;
+  padding:14px 5%;
+  border-bottom:1px solid var(--border);
+}
+nav button {
+  background:transparent; color:var(--muted);
+  border:1px solid var(--border);
+  padding:9px 13px; border-radius:8px;
+  cursor:pointer;
+}
+nav button.active, nav button:hover {
+  color:var(--cyan); border-color:var(--cyan);
+  box-shadow:0 0 12px rgba(0,245,255,.2);
+}
+main { max-width:1200px; margin:auto; padding:25px 5% 60px; }
+.hero { padding:25px 0; }
+.eyebrow { color:var(--pink); letter-spacing:3px; font-size:12px; }
+h1 {
+  font-size:clamp(34px,7vw,65px);
+  margin:12px 0;
+  line-height:1.05;
+}
+h1 span { color:var(--cyan); text-shadow:0 0 20px #00f5ff66; }
+.subtitle { color:var(--muted); line-height:1.7; max-width:650px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:15px; margin:22px 0;
+}
+.card {
+  background:linear-gradient(145deg,var(--panel2),var(--panel));
+  border:1px solid var(--border);
+  border-radius:14px; padding:19px;
+  box-shadow:0 8px 30px #0003;
+}
+.card h3 { margin:0 0 10px; color:var(--cyan); }
+.card p { color:var(--muted); line-height:1.55; font-size:14px; }
+.metric { font-size:25px; font-weight:bold; color:var(--pink); }
+.section { display:none; }
+.section.active { display:block; }
+input,textarea,select {
+  width:100%; background:#080e1d; color:var(--text);
+  border:1px solid var(--border); border-radius:8px;
+  padding:12px; margin:7px 0 12px; font:inherit;
+}
+textarea { min-height:100px; resize:vertical; }
+button.primary {
+  background:linear-gradient(90deg,#00aebb,#6d50dc);
+  color:white; border:0; border-radius:8px;
+  padding:11px 16px; cursor:pointer; font-weight:bold;
+}
+button.primary:hover { filter:brightness(1.2); }
+button.secondary {
+  background:transparent; color:var(--cyan);
+  border:1px solid var(--cyan); border-radius:8px;
+  padding:10px 14px; cursor:pointer;
+}
+.output {
+  white-space:pre-wrap; background:#080e1d;
+  border:1px solid var(--border); border-radius:9px;
+  padding:13px; min-height:45px; color:#c7faff;
+  line-height:1.6; overflow-wrap:anywhere;
+}
+.chatbox { height:270px; overflow:auto; margin:12px 0; }
+.message { padding:10px; margin:8px 0; border-radius:8px; line-height:1.5; }
+.user { background:#172c48; }
+.ai { background:#211c3b; border-left:3px solid var(--pink); }
+.small { color:var(--muted); font-size:12px; line-height:1.6; }
+table { width:100%; border-collapse:collapse; margin-top:12px; }
+th,td { border-bottom:1px solid var(--border); padding:10px 7px; text-align:left; font-size:13px; }
+th { color:var(--cyan); }
+footer {
+  text-align:center; border-top:1px solid var(--border);
+  color:var(--muted); padding:25px; font-size:12px;
+}
+@media(max-width:600px) {
+  header { align-items:flex-start; flex-direction:column; }
+  nav { padding:12px 4%; }
+  nav button { font-size:12px; }
+  main { padding-left:4%; padding-right:4%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ANNA<span> AI</span></div>
+  <div class="status">● SYSTEM ONLINE — DEMO MODE</div>
+</header>
+
+<nav>
+  <button class="active" data-page="home">Dashboard</button>
+  <button data-page="assistant">AI Assistant</button>
+  <button data-page="daily">Daily Life</button>
+  <button data-page="finance">Finance</button>
+  <button data-page="trading">Trading</button>
+  <button data-page="flipper">Flipper Lab</button>
+  <button data-page="income">Income Ideas</button>
+</nav>
+
+<main>
+<section id="home" class="section active">
+  <div class="hero">
+    <div class="eyebrow">PERSONAL INTELLIGENCE SYSTEM</div>
+    <h1>WELCOME TO<br><span>ANNA AI.</span></h1>
+    <p class="subtitle">
+      Satu ruang digital untuk membantu mengelola aktivitas harian,
+      keuangan, riset pasar, eksperimen teknologi, dan ide bisnis.
+      Built for curiosity. Designed for the future.
+    </p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>01 / PERSONAL AI</h3>
+      <div class="metric">ASSIST</div>
+      <p>Ruang percakapan dan bantuan untuk ide, pekerjaan, serta perencanaan.</p>
+    </div>
+    <div class="card">
+      <h3>02 / FINANCE</h3>
+      <div class="metric">TRACK</div>
+      <p>Catat pemasukan, pengeluaran, dan kondisi keuangan.</p>
+    </div>
+    <div class="card">
+      <h3>03 / MARKETS</h3>
+      <div class="metric">RESEARCH</div>
+      <p>Jurnal analisis crypto, forex, saham, indeks, dan komoditas.</p>
+    </div>
+    <div class="card">
+      <h3>04 / INNOVATION</h3>
+      <div class="metric">CREATE</div>
+      <p>Catat eksperimen teknologi dan peluang penghasilan.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>ANNA AI — SYSTEM NOTE</h3>
+    <p>
+      Ini adalah versi awal website. Fitur pencatatan berjalan di browser
+      perangkat masing-masing. Asisten AI sungguhan dan sinkronisasi akun
+      membutuhkan backend dan konfigurasi tambahan.
+    </p>
+  </div>
+</section>
+
+<section id="assistant" class="section">
+  <h2>AI Assistant</h2>
+  <p class="subtitle">Ruang percakapan demo Anna AI.</p>
+  <div id="chat" class="output chatbox">
+    <div class="message ai">Halo! Saya Anna AI versi demo. Apa yang ingin kamu rencanakan hari ini?</div>
+  </div>
+  <textarea id="prompt" placeholder="Tulis pertanyaan atau ide kamu..."></textarea>
+  <button class="primary" onclick="sendMessage()">Kirim pesan</button>
+  <p class="small">Mode demo: jawaban otomatis sederhana. Belum terhubung ke model AI online.</p>
+</section>
+
+<section id="daily" class="section">
+  <h2>Daily Life & Work</h2>
+  <p class="subtitle">Simpan fokus, pekerjaan, dan catatan harian.</p>
+  <div class="card">
+    <h3>Today's Focus</h3>
+    <input id="focus" placeholder="Apa prioritas utama hari ini?">
+    <button class="primary" onclick="saveText('focus')">Simpan fokus</button>
+    <div id="focusSaved" class="output" style="margin-top:10px"></div>
+  </div>
+  <div class="card" style="margin-top:15px">
+    <h3>Personal Notes</h3>
+    <textarea id="notes" placeholder="Tulis catatan, ide, atau pekerjaan..."></textarea>
+    <button class="primary" onclick="saveText('notes')">Simpan catatan</button>
+    <p class="small">Catatan disimpan di browser perangkat ini.</p>
+  </div>
+</section>
+
+<section id="finance" class="section">
+  <h2>Personal Finance</h2>
+  <p class="subtitle">Pencatatan sederhana pemasukan dan pengeluaran.</p>
+  <div class="grid">
+    <div class="card"><p>Total pemasukan</p><div id="incomeTotal" class="metric">Rp0</div></div>
+    <div class="card"><p>Total pengeluaran</p><div id="expenseTotal" class="metric">Rp0</div></div>
+    <div class="card"><p>Saldo tercatat</p><div id="balance" class="metric">Rp0</div></div>
+  </div>
+  <div class="card">
+    <h3>Tambah transaksi</h3>
+    <select id="type">
+      <option value="income">Pemasukan</option>
+      <option value="expense">Pengeluaran</option>
+    </select>
+    <input id="amount" type="number" min="0" placeholder="Jumlah dalam rupiah">
+    <input id="description" placeholder="Keterangan transaksi">
+    <button class="primary" onclick="addTransaction()">Tambah transaksi</button>
+  </div>
+  <div class="card" style="margin-top:15px">
+    <h3>Riwayat transaksi</h3>
+    <div id="transactions"></div>
+    <button class="secondary" onclick="clearTransactions()">Hapus semua transaksi</button>
+  </div>
+  <p class="small">Data hanya tersimpan lokal di browser. Jangan gunakan versi demo ini untuk menyimpan data keuangan sensitif.</p>
+</section>
+
+<section id="trading" class="section">
+  <h2>Trading & Market Journal</h2>
+  <p class="subtitle">Catat pengamatan dan rencana analisis pasar.</p>
+  <div class="grid">
+    <div class="card"><h3>CRYPTO</h3><p>Bitcoin, Ethereum, dan aset digital lainnya.</p></div>
+    <div class="card"><h3>FOREX</h3><p>Pasangan mata uang dan pergerakan valuta.</p></div>
+    <div class="card"><h3>STOCKS</h3><p>Riset saham dan perusahaan publik.</p></div>
+    <div class="card"><h3>INDICES</h3><p>Indeks pasar dan sentimen ekonomi.</p></div>
+    <div class="card"><h3>COMMODITIES</h3><p>Emas, minyak, dan komoditas lainnya.</p></div>
+  </div>
+  <div class="card">
+    <h3>Catatan analisis</h3>
+    <input id="market" placeholder="Instrumen, misalnya BTC/USDT atau XAU/USD">
+    <select id="direction">
+      <option>Belum ditentukan</option>
+      <option>Bullish</option>
+      <option>Bearish</option>
+      <option>Sideways</option>
+    </select>
+    <textarea id="analysis" placeholder="Alasan analisis, level penting, risiko, dan rencana..."></textarea>
+    <button class="primary" onclick="saveMarket()">Simpan analisis</button>
+    <div id="marketList" style="margin-top:15px"></div>
+  </div>
+  <p class="small">Jurnal ini bukan sinyal trading. Trading memiliki risiko kerugian; lakukan riset dan manajemen risiko sendiri.</p>
+</section>
+
+<section id="flipper" class="section">
+  <h2>Flipper Zero Lab</h2>
+  <p class="subtitle">Ruang dokumentasi belajar perangkat dan eksperimen keamanan yang sah.</p>
+  <div class="card">
+    <h3>Experiment Journal</h3>
+    <input id="experiment" placeholder="Nama eksperimen">
+    <textarea id="experimentNote" placeholder="Tujuan, perangkat milik sendiri, hasil, dan catatan..."></textarea>
+    <button class="primary" onclick="saveExperiment()">Simpan eksperimen</button>
+    <div id="experimentList" style="margin-top:15px"></div>
+  </div>
+  <div class="card" style="margin-top:15px">
+    <h3>Responsible Use</h3>
+    <p>Gunakan hanya pada perangkat, kartu, dan sistem milik sendiri atau yang penggunaannya telah mendapat izin jelas. Jangan mencoba mengakses, menyalin, atau mengganggu sistem orang lain.</p>
+  </div>
+</section>
+
+<section id="income" class="section">
+  <h2>Income & Business Ideas</h2>
+  <p class="subtitle">Ruang untuk mengembangkan ide penghasilan menjadi rencana nyata.</p>
+  <div class="grid">
+    <div class="card"><h3>Digital Products</h3><p>Template, desain, e-book, dan produk digital.</p></div>
+    <div class="card"><h3>Freelancing</h3><p>Jasa desain, penulisan, administrasi, dan teknologi.</p></div>
+    <div class="card"><h3>Online Business</h3><p>Riset pasar, toko online, dan layanan digital.</p></div>
+    <div class="card"><h3>Education</h3><p>Kursus, tutorial, dan konten edukasi.</p></div>
+  </div>
+  <div class="card">
+    <h3>Business Planner</h3>
+    <input id="idea" placeholder="Nama ide bisnis">
+    <textarea id="ideaPlan" placeholder="Target pelanggan, masalah yang diselesaikan, biaya, dan langkah pertama..."></textarea>
+    <button class="primary" onclick="saveIdea()">Simpan ide bisnis</button>
+    <div id="ideaList" style="margin-top:15px"></div>
+  </div>
+  <p class="small">Ide bisnis bukan jaminan pendapatan. Validasi kebutuhan pasar, biaya, dan risikonya sebelum berinvestasi.</p>
+</section>
+</main>
+
+<footer>
+  ANNA AI ©️ 2026 — PERSONAL INTELLIGENCE PROJECT<br>
+  Cyberpunk Interface · Prototype Edition
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    button.classList.add("active");
+    $(button.dataset.page).classList.add("active");
+  });
+});
+
+function readData(key, fallback=[]) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+}
+function writeData(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function saveText(id) {
+  const value = $(id).value;
+  localStorage.setItem("anna_"+id, value);
+  if (id === "focus") $("focusSaved").textContent = value || "Belum ada fokus tersimpan.";
+  alert("Berhasil disimpan di browser ini.");
+}
+function loadText() {
+  $("focus").value = localStorage.getItem("anna_focus") || "";
+  $("notes").value = localStorage.getItem("anna_notes") || "";
+  $("focusSaved").textContent = $("focus").value;
+}
+
+function sendMessage() {
+  const prompt = $("prompt").value.trim();
+  if (!prompt) return;
+  const chat = $("chat");
+  chat.innerHTML += '<div class="message user"></div>';
+  chat.lastElementChild.textContent = prompt;
+  chat.innerHTML += '<div class="message ai"></div>';
+  chat.lastElementChild.textContent =
+    "Terima kasih sudah berbagi. Ini masih Anna AI versi demo. " +
+    "Untuk jawaban AI yang benar-benar cerdas, website perlu dihubungkan ke layanan AI melalui backend yang aman.";
+  $("prompt").value = "";
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function rupiah(value) {
+  return new Intl.NumberFormat("id-ID", {
+    style:"currency", currency:"IDR", maximumFractionDigits:0
+  }).format(value);
+}
+function addTransaction() {
+  const amount = Number($("amount").value);
+  const description = $("description").value.trim();
+  if (!amount || amount <= 0 || !description) {
+    alert("Isi jumlah dan keterangan transaksi terlebih dahulu.");
+    return;
+  }
+  const list = readData("anna_transactions");
+  list.push({
+    type:$("type").value,
+    amount,
+    description,
+    date:new Date().toLocaleDateString("id-ID")
+  });
+  writeData("anna_transactions", list);
+  $("amount").value = "";
+  $("description").value = "";
+  renderTransactions();
+}
+function renderTransactions() {
+  const list = readData("anna_transactions");
+  let income = 0, expense = 0;
+  list.forEach(t => {
+    if (t.type === "income") income += t.amount;
+    else expense += t.amount;
+  });
+  $("incomeTotal").textContent = rupiah(income);
+  $("expenseTotal").textContent = rupiah(expense);
+  $("balance").textContent = rupiah(income-expense);
+  $("transactions").innerHTML = "";
+  if (!list.length) {
+    $("transactions").textContent = "Belum ada transaksi.";
+    return;
+  }
+  const table = document.createElement("table");
+  table.innerHTML = "<tr><th>Tanggal</th><th>Keterangan</th><th>Jenis</th><th>Jumlah</th></tr>";
+  list.slice().reverse().forEach(t => {
+    const tr = document.createElement("tr");
+    [t.date,t.description,t.type === "income" ? "Masuk" : "Keluar",rupiah(t.amount)]
+      .forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+    table.appendChild(tr);
+  });
+  $("transactions").appendChild(table);
+}
+function clearTransactions() {
+  if (confirm("Hapus semua transaksi di browser ini?")) {
+    writeData("anna_transactions", []);
+    renderTransactions();
+  }
+}
+
+function addToList(key, container, item) {
+  const list = readData(key);
+  list.push(item);
+  writeData(key, list);
+  renderList(key, container);
+}
+function renderList(key, container) {
+  const list = readData(key);
+  const target = $(container);
+  target.innerHTML = "";
+  if (!list.length) {
+    target.textContent = "Belum ada catatan.";
+    return;
+  }
+  list.slice().reverse().forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.style.marginTop = "9px";
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    const body = document.createElement("p");
+    body.textContent = item.body;
+    const date = document.createElement("div");
+    date.className = "small";
+    date.textContent = item.date;
+    div.append(title, body, date);
+    target.appendChild(div);
+  });
+}
+function saveMarket() {
+  const title = $("market").value.trim();
+  const body = $("direction").value + " — " + $("analysis").value.trim();
+  if (!title || !$("analysis").value.trim()) {
+    alert("Isi instrumen dan catatan analisis.");
+    return;
+  }
+  addToList("anna_markets","marketList",{
+    title,body,date:new Date().toLocaleString("id-ID")
+  });
+  $("market").value = "";
+  $("analysis").value = "";
+}
+function saveExperiment() {
+  const title = $("experiment").value.trim();
+  const body = $("experimentNote").value.trim();
+  if (!title || !body) {
+    alert("Isi nama dan catatan eksperimen.");
+    return;
+  }
+  addToList("anna_experiments","experimentList",{
+    title,body,date:new Date().toLocaleString("id-ID")
+  });
+  $("experiment").value = "";
+  $("experimentNote").value = "";
+}
+function saveIdea() {
+  const title = $("idea").value.trim();
+  const body = $("ideaPlan").value.trim();
+  if (!title || !body) {
+    alert("Isi nama dan rencana ide bisnis.");
+    return;
+  }
+  addToList("anna_ideas","ideaList",{
+    title,body,date:new Date().toLocaleString("id-ID")
+  });
+  $("idea").value = "";
+  $("ideaPlan").value = "";
+}
+
+loadText();
+renderTransactions();
+renderList("anna_markets","marketList");
+renderList("anna_experiments","experimentList");
+renderList("anna_ideas","ideaList");
+</script>
+</body>
+</html>
