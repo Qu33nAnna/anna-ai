@@ -342,20 +342,42 @@ function loadText() {
   $("focusSaved").textContent = $("focus").value;
 }
 
-function sendMessage() {
+async function sendMessage() {
   const prompt = $("prompt").value.trim();
   if (!prompt) return;
+
   const chat = $("chat");
+  const sendButton = document.querySelector('button[onclick="sendMessage()"]');
+
   chat.innerHTML += '<div class="message user"></div>';
   chat.lastElementChild.textContent = prompt;
-  chat.innerHTML += '<div class="message ai"></div>';
-  chat.lastElementChild.textContent =
-    "Terima kasih sudah berbagi. Ini masih Anna AI versi demo. " +
-    "Untuk jawaban AI yang benar-benar cerdas, website perlu dihubungkan ke layanan AI melalui backend yang aman.";
-  $("prompt").value = "";
-  chat.scrollTop = chat.scrollHeight;
-}
 
+  const replyBox = document.createElement("div");
+  replyBox.className = "message ai";
+  replyBox.textContent = "Anna sedang berpikir...";
+  chat.appendChild(replyBox);
+
+  $("prompt").value = "";
+  if (sendButton) sendButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: prompt })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Gagal memproses pesan.");
+
+    replyBox.textContent = data.reply || "Belum ada jawaban.";
+  } catch (error) {
+    replyBox.textContent = "Gagal menghubungi Anna AI: " + error.message;
+  } finally {
+    if (sendButton) sendButton.disabled = false;
+    chat.scrollTop = chat.scrollHeight;
+  }
+}
 function rupiah(value) {
   return new Intl.NumberFormat("id-ID", {
     style:"currency", currency:"IDR", maximumFractionDigits:0
